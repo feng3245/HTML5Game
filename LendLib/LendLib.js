@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
   Template.hello.greeting = function () {
-    return "Welcome to LendLib.";
+    return "My list.";
   };
 
   Template.hello.events({
