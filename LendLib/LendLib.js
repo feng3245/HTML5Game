@@ -24,6 +24,40 @@ if (Meteor.isClient) {
   Template.categories.new_cat = function (){
   return Session.equals('adding_category',true);
   };
+  Template.list.items = function(){
+    if ((Session.get('current_list')==null) || Session.equals('current_list',null))
+      return null;
+    else
+    {
+
+      var cats = lists.findOne({_id:Session.get('current_list')});
+
+      if (cats&&cats.items)
+      {
+        if(cats.items.length)
+        {
+          for(var i = 0; i<cats.items.length;i++) 
+          {
+            var d = cats.items[i]; d.Lendee = d.LentTo ? d.LentTo :
+            "free"; d.LendClass = d.LentTo ?
+            "label-important" : "label-success";
+          }
+        }
+        else
+        {
+            var d = cats.items; d.Lendee = d.LentTo ? d.LentTo :
+            "free"; d.LendClass = d.LentTo ?
+            "label-important" : "label-success";
+            var temp = new Array();
+            temp[0] = cats.items;
+            return  temp;
+        }
+         return cats.items;
+      }
+     
+    }
+
+  };
   Template.categories.events({
 	'click #btnNewCat': function (e, t) {
 	Session.set('adding_category', true);
@@ -44,8 +78,8 @@ if (Meteor.isClient) {
 	},
 	'focusout #add-category': function(e,t){
 		Session.set('adding_category',false);
-	}
-
+	},
+  'click .category': selectCategory
       });
 /////Generic Helper Functions/////
 //this function puts our cursor where it needs to be.
@@ -54,7 +88,9 @@ function focusText(i) {
 	i.select();
 	};
 }
-
+function selectCategory(e,t){
+  Session.set('current_list',this._id);
+}
 if (Meteor.isServer) {
   Meteor.startup(function () {
     // code to run on server at startup
