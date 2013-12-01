@@ -51,13 +51,20 @@ if (Meteor.isClient) {
             var temp = new Array();
             temp[0] = cats.items;
             return  temp;
-        }
-         return cats.items;
+        }        
+        return cats.items;
       }
      
     }
 
   };
+  Template.list.list_selected = function(){return (!Session.equals('current_list',null)&&Session.get('current_list')!=null); };
+  Template.list.list_adding = function(){
+    return (Session.equals('list_adding', true));
+  };
+  Template.list.lendee_editing = function(){
+return (Session.equals('lendee_input',this.Name));
+};
   Template.categories.events({
 	'click #btnNewCat': function (e, t) {
 	Session.set('adding_category', true);
@@ -81,6 +88,27 @@ if (Meteor.isClient) {
 	},
   'click .category': selectCategory
       });
+  Template.list.events({
+    'click .lendee': function(e,t){
+    Session.set('lendee_input', this.Name);
+  },
+    'click #btnAddItem': function(e,t){
+      Session.set('list_adding', true);
+      Meteor.flush();
+      focusText(t.find("#item_to_add"));
+    },
+    'keyup #item_to_add': function (e,t){
+      if (e.which === 13)
+      {
+        addItem(Session.get('current_list'),e.target.value);
+        Session.set('list_adding',false);
+      }
+    },
+    'focusout #item_to_add': function(e,t){
+      Session.set('list_adding',false);
+    }
+
+});
 /////Generic Helper Functions/////
 //this function puts our cursor where it needs to be.
 function focusText(i) {
@@ -95,4 +123,10 @@ if (Meteor.isServer) {
   Meteor.startup(function () {
     // code to run on server at startup
   });
+}
+function addItem(list_id,item_name){
+  if (!item_name&&!list_id)
+    return;
+  lists.update({_id:list_id},
+    {$addToSet:{items:{Name:item_name}}});
 }
