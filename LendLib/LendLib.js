@@ -90,7 +90,9 @@ return (Session.equals('lendee_input',this.Name));
       });
   Template.list.events({
     'click .lendee': function(e,t){
-    Session.set('lendee_input', this.Name);
+    Session.set('lendee_input',this.Name);
+Meteor.flush();
+focusText(t.find("#edit_lendee"),this.LentTo);
   },
     'click #btnAddItem': function(e,t){
       Session.set('list_adding', true);
@@ -104,16 +106,35 @@ return (Session.equals('lendee_input',this.Name));
         Session.set('list_adding',false);
       }
     },
+    'keyup #edit_lendee': function(e,t){
+      if(e.which === 13)
+      {
+          updateLendee(Session.get('current_list'), this.Name, e.target.value);
+          Session.set('lendee_input', null);
+      }
+      if(e.which === 27)
+      {
+
+        Session.set('lendee_input', null);
+      }
+    },
+    'focusout #edit_lendee': function(e,t){
+      Session.set('lendee_input', null);
+    },
     'focusout #item_to_add': function(e,t){
       Session.set('list_adding',false);
+    },
+    'click .delete_item': function(e,t){
+      removeItem(Session.get('current_list'),e.target.id);
     }
-
 });
 /////Generic Helper Functions/////
 //this function puts our cursor where it needs to be.
-function focusText(i) {
+function focusText(i, val) {
 	i.focus();
+  i.value = val? val: "";
 	i.select();
+
 	};
 }
 function selectCategory(e,t){
@@ -129,4 +150,26 @@ function addItem(list_id,item_name){
     return;
   lists.update({_id:list_id},
     {$addToSet:{items:{Name:item_name}}});
+}
+function removeItem(list_id,item_name)
+{
+  if(!item_name&&!list_id)
+    return;
+  lists.update({_id:list_id},
+    {$pull:{items:{Name:item_name}}});
+}
+function updateLendee(list_id, item_name, lendee_name)
+{
+  var l = lists.findOne({"_id":list_id , "items.Name":item_name});
+  if (l&&l.items)
+  {
+    for (var i = 0; i<l.items.length; i++)
+    {
+      if (l.items[i].Name === item_name)
+      {
+        l.items[i].LentTo = lendee_name;
+      }
+    }
+    lists.update({"_id":list_id},{$set:{"items":l.items}});
+  }
 }
