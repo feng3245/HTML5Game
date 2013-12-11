@@ -1,0 +1,28 @@
+
+<!DOCTYPE HTML>
+<html>
+<head><title>canvas game</title></head>
+<body><canvas id="test" height="600" width="600"></canvas><script type="text/javascript">var canvas = document.getElementById("test");var context = canvas.getContext("2d");
+self.drawGameBoard = function() {
+ var ctx = self.context;
+
+ctx.beginPath();
+
+ ctx.moveTo(200,0);
+ ctx.lineTo(200,600);
+
+ctx.moveTo(400,0);
+ctx.lineTo(400,600);
+
+ctx.moveTo(0,200);
+ ctx.lineTo(600,200);
+
+ ctx.moveTo(0,400);
+  ctx.lineTo(600,400);
+
+ ctx.stroke();
+}
+drawGameBoard();
+</script></body>
+
+</html>
