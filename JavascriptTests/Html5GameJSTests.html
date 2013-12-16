@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>JS Test</title>
+    <script type="text/javascript" src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="../demogame/client/drawSprite.js"></script>
+<script type="text/javascript" src="../demogame/client/GameState.js"></script>
+    <link href="code.jquery.com/qunit/qunit-1.12.0.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+ <div id="qunit"></div>
+ <div id="qunit-fixture"></div>
+ <script type="text/javascript">
+ var gamestate = new GameState();
+ test("Game state tests", function()
+ 	{
+ 		equal(gamestate.haveDrawn(0,0),false,"no sprites have been drawn");
+ 		equal(gamestate.lastDrawn, '', "no sprite were drawn yet");
+ 		gamestate.trackSprite(0,0, 'x');
+ 		equal(gamestate.drawnCords[0].x,0, "x have been tracked");
+ 		equal(gamestate.drawnCords[0].y,0, "y have been tracked");
+ 		equal(gamestate.lastDrawn, 'x', "x was drawn");
+ 		equal(gamestate.haveDrawn(0,0),true,"sprite have been drawn at 0,0");
+ 		equal(gamestate.haveDiagnalWin(), false, "no winning moves made yet");
+ 		equal(gamestate.haveVerticalWin(), false, "no winning moves made yet");
+ 		equal(gamestate.haveHorizontalWin(), false, "no winning moves made yet");
+ 		//reset the game state
+ 		gamestate = new GameState();
+ 		gamestate.trackSprite(0,0, 'x');
+ 		gamestate.trackSprite(200,200, 'x');
+ 		gamestate.trackSprite(400,400, 'x');
+ 		equal(isDiagonal(gamestate.drawnCords[gamestate.drawnCords.length-1]), true, "this is a diagonal coordinate");
+ 		equal(isDiagonal({x:200, y: 400}), false, "this is not diagonal coordinate");
+ 		equal(isDiagonal({x:400, y: 200}), false, "this is not diagonal coordinate");
+ 		equal(gamestate.haveDiagnalWin(),true, "diagonal win is present");
+ 		equal(gamestate.haveVerticalWin(), false, "no vertical win present");
+ 		equal(gamestate.haveHorizontalWin(), false, "no horizontal win present");
+ 		
+ 		//reset the game state
+ 		gamestate = new GameState();
+ 		gamestate.trackSprite(0,0, 'x');
+ 		gamestate.trackSprite(200,0, 'x');
+ 		gamestate.trackSprite(400,0, 'x');
+ 		equal(gamestate.haveDiagnalWin(),false, "diagonal win not present");
+ 		equal(gamestate.haveVerticalWin(), false, "no vertical win present");
+ 		equal(gamestate.haveHorizontalWin(), true, "horizontal win present");
+ 		
+ 		//reset the game state
+ 		gamestate = new GameState();
+ 		gamestate.trackSprite(0,0, 'x');
+ 		gamestate.trackSprite(0,200, 'x');
+ 		gamestate.trackSprite(0,400, 'x');
+ 		equal(gamestate.haveDiagnalWin(),false, "no diagonal win not present");
+ 		equal(gamestate.haveVerticalWin(), true, "vertical win present");
+ 		equal(gamestate.haveHorizontalWin(), false, "no horizontal win present");
+ 		//reset the game state
+ 		gamestate = new GameState();
+ 		gamestate.trackSprite(0,200, 'x');
+ 		gamestate.trackSprite(200,200, 'x');
+ 		gamestate.trackSprite(400,200, 'x');
+ 		equal(gamestate.haveDiagnalWin(),false, "diagonal win not present");
+ 		equal(gamestate.haveVerticalWin(), false, "no vertical win present");
+ 		equal(gamestate.haveHorizontalWin(), true, "horizontal win present");
+ 		
+ 		//reset the game state
+ 		gamestate = new GameState();
+ 		gamestate.trackSprite(200,0, 'x');
+ 		gamestate.trackSprite(200,200, 'x');
+ 		gamestate.trackSprite(200,400, 'x');
+ 		equal(gamestate.haveDiagnalWin(),false, "no diagonal win not present");
+ 		equal(gamestate.haveVerticalWin(), true, "vertical win present");
+ 		equal(gamestate.haveHorizontalWin(), false, "no horizontal win present");
+ 		
+ 		
+ 	});
+ </script>
+</body>
+</html>
