@@ -70,7 +70,7 @@ this.drawSprite= function(xtranslation,ytranslation)
 		}
 		else
 		{
-			this.trackSprite(xtranslation, ytranslation, 'y');
+			this.trackSprite(xtranslation, ytranslation, 'o');
 			this.drawSpriteFunct = drawXSprite;
 
 		}	

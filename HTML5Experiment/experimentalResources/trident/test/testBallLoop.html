@@ -1,0 +1,221 @@
+<html>
+
+<head>
+<script type='text/javascript' src='../trident.js'></script>
+<script type='text/javascript' src='graphicslib.js'></script>
+<script type='text/javascript' src='ballVisualizer.js'></script>
+
+<script>
+
+function Ball() {
+  this.radius = 20;
+  this.ballY = this.radius;
+}
+
+var ball = new Ball();
+
+function draw() {
+  var canvas = document.getElementById("ballCanvas");
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+    
+    var w = canvas.width;
+    var h = canvas.height;
+    
+    ctx.clearRect(0,0,w,h); 
+    ctx.beginPath();
+    ctx.arc(w/2, ball.ballY, ball.radius, 0, 360, false);
+
+    var radgrad = ctx.createRadialGradient(
+      w/2-ball.radius/4, ball.ballY-ball.radius/5, ball.radius/4,
+      w/2, ball.ballY, ball.radius);
+    radgrad.addColorStop(0, '#00FF00');
+    radgrad.addColorStop(1, '#003300');
+    ctx.fillStyle = radgrad;
+    ctx.fill();
+  }
+}
+
+function drawVisualizer() {
+  var canvas = document.getElementById("visualizerCanvas");
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+    
+    var w = canvas.width;
+    var h = canvas.height;
+    
+    visualizer.draw(ctx, w, h);
+  }
+}
+
+var timelineBallFalling;
+
+function run() {
+  if (timelineBallFalling != undefined) {
+    timelineBallFalling.cancel();
+  }
+  document.getElementById("stateTracking").value = "";
+  timelineBallFalling = new Timeline(ball);
+  timelineBallFalling.addPropertiesToInterpolate([
+    // interpolate the ball Y position
+    { property: "ballY", 
+      from: ball.radius, 
+      to: document.getElementById("ballCanvas").height - ball.radius, 
+      interpolator: new IntPropertyInterpolator() }
+  ]);
+  var drawCallback = function(timeline, durationFraction, timelinePosition) {
+    draw();
+  }
+  var reportStateChange = function(timeline, oldState, newState, durationFraction, timelinePosition) {
+    document.getElementById("stateTracking").value += ("From " + oldState + " to " + newState + 
+      " at " + timelinePosition + "\n");
+    draw();
+  }
+  timelineBallFalling.addEventListener("onpulse", drawCallback);
+  timelineBallFalling.addEventListener("onstatechange", reportStateChange);
+
+  var visualizerCallback = function(timeline, durationFraction, timelinePosition) {
+    visualizer.addDot(durationFraction, timelinePosition);
+  }
+  timelineBallFalling.addEventListener("onpulse", visualizerCallback);
+
+  timelineBallFalling.duration = 2000;
+  timelineBallFalling.initialDelay = document.getElementById("initialDelay").value;
+  timelineBallFalling.cycleDelay = document.getElementById("cycleDelay").value;
+
+  var selectedEaseIndex = parseInt(document.getElementById("ease").value);
+  var selectedEase;
+  switch (selectedEaseIndex) {
+    case 1: selectedEase = new LinearEase(); break;
+    case 2: selectedEase = new SineEase(); break;
+    case 3: selectedEase = new SplineEase(0.4, 0.0, 0.6, 1.0); break;
+    case 4: selectedEase = new SplineEase(0.8, 0.0, 0.2, 1.0); break;
+    case 5: selectedEase = new QuadraticEaseIn(); break;
+    case 6: selectedEase = new QuadraticEaseOut(); break;
+    case 7: selectedEase = new QuadraticEaseInOut(); break;
+    case 8: selectedEase = new CubicEaseIn(); break;
+    case 9: selectedEase = new CubicEaseOut(); break;
+    case 10: selectedEase = new CubicEaseInOut(); break;
+    case 11: selectedEase = new QuarticEaseIn(); break;
+    case 12: selectedEase = new QuarticEaseOut(); break;
+    case 13: selectedEase = new QuarticEaseInOut(); break;
+    case 14: selectedEase = new SinusoidalEaseIn(); break;
+    case 15: selectedEase = new SinusoidalEaseOut(); break;
+    case 16: selectedEase = new SinusoidalEaseInOut(); break;
+    case 17: selectedEase = new ExponentialEaseIn(); break;
+    case 18: selectedEase = new ExponentialEaseOut(); break;
+    case 19: selectedEase = new ExponentialEaseInOut(); break;
+    case 20: selectedEase = new CircularEaseIn(); break;
+    case 21: selectedEase = new CircularEaseOut(); break;
+    case 22: selectedEase = new CircularEaseInOut(); break;
+    case 23: selectedEase = new ElasticEaseIn(); break;
+    case 24: selectedEase = new ElasticEaseOut(); break;
+    case 25: selectedEase = new ElasticEaseInOut(); break;
+    case 26: selectedEase = new BackEaseIn(); break;
+    case 27: selectedEase = new BackEaseOut(); break;
+    case 28: selectedEase = new BackEaseInOut(); break;
+    case 29: selectedEase = new BounceEaseIn(); break;
+    case 30: selectedEase = new BounceEaseOut(); break;
+    case 31: selectedEase = new BounceEaseInOut(); break;
+  }
+  timelineBallFalling.ease = selectedEase;
+  visualizer.setEase(selectedEase);
+
+  var msToSkip = parseInt(document.getElementById("toSkip").value);
+  if (msToSkip == 0) {
+    timelineBallFalling.playInfiniteLoop(RepeatBehavior.REVERSE);
+  } else {
+    timelineBallFalling.playInfiniteLoopSkipping(RepeatBehavior.REVERSE, msToSkip);
+  }
+}
+
+function cancel() {
+  if (timelineBallFalling != undefined) {
+    timelineBallFalling.cancelAtCycleBreak();
+  }
+}
+
+function suspend() {
+  if (timelineBallFalling != undefined) {
+    timelineBallFalling.suspend();
+  }
+}
+
+function resume() {
+  if (timelineBallFalling != undefined) {
+    timelineBallFalling.resume();
+  }
+}
+
+</script>
+
+</head>
+
+<body onload="draw(); drawVisualizer();">
+  <canvas id="ballCanvas" width="400" height="200"></canvas><br>
+  <canvas id="visualizerCanvas" width="400" height="300"></canvas><br>
+  
+  Initial delay:
+  <input id="initialDelay" value="0"><br>
+  Cycle delay:
+  <input id="cycleDelay" value="0"><br>
+  To skip:
+  <input id="toSkip" value="0"><br>
+  Ease:
+  <select id="ease">
+  <option value="1">1. Linear</option>
+  <option value="2">2. Sine</option>
+  <option value="3">3. Spline (0.4, 0.0)-(0.6,1.0)</option>
+  <option value="4">4. Spline (0.8, 0.0)-(0.2,1.0)</option>
+  <option value="5">5. Quadratic in</option>
+  <option value="6">6. Quadratic out</option>
+  <option value="7">7. Quadratic in out</option>
+  <option value="8">8. Cubic in</option>
+  <option value="9">9. Cubic out</option>
+  <option value="10">10. Cubic in out</option>
+  <option value="11">11. Quartic in</option>
+  <option value="12">12. Quartic out</option>
+  <option value="13">13. Quartic in out</option>
+  <option value="14">14. Sinusoidal in</option>
+  <option value="15">15. Sinusoidal out</option>
+  <option value="16">16. Sinusoidal in out</option>
+  <option value="17">17. Exponential in</option>
+  <option value="18">18. Exponential out</option>
+  <option value="19">19. Exponential in out</option>
+  <option value="20">20. Circular in</option>
+  <option value="21">21. Circular out</option>
+  <option value="22">22. Circular in out</option>
+  <option value="23">23. Elastic in</option>
+  <option value="24">24. Elastic out</option>
+  <option value="25">25. Elastic in out</option>
+  <option value="26">26. Back in</option>
+  <option value="27">27. Back out</option>
+  <option value="28">28. Back in out</option>
+  <option value="29">29. Bounce in</option>
+  <option value="30">30. Bounce out</option>
+  <option value="31">31. Bounce in out</option>
+  </select><br>
+  
+  <input type="button" name="buttonRun" value="run" onClick="run()">
+  <input type="button" name="buttonCancel" value="cancel" onClick="cancel()">
+  <input type="button" name="buttonSuspend" value="suspend" onClick="suspend()">
+  <input type="button" name="buttonResume" value="resume" onClick="resume()">
+  <br>
+  <textarea id="stateTracking" rows="10" cols="50"></textarea>
+  
+  <script>
+    var graphicslib = new GraphicsLib();
+    var visualizer = new TimelineVisualizer(graphicslib);
+
+    var visualizerRepaintTimeline = new Timeline();
+    visualizerRepaintTimeline.addEventListener("onpulse", 
+      function(timeline, durationFraction, timelinePosition) {
+        drawVisualizer();
+      }
+    );
+    visualizerRepaintTimeline.playInfiniteLoop(RepeatBehavior.REVERSE);
+
+  </script>
+</body>
+
+</html>

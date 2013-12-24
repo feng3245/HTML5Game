@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Experiments</title>
+	<script type="text/javascript" src="./experimentalResources/trident/trident.js"></script>
+</head>
+<body>
+	<canvas id="exprimentalboard" width="500" height="600"></canvas>
+	<span id="timeline" style="color:rgb(0,0,255);" 
+	onmouseover="rolloverTimeline.play();" 
+	onmouseout="rolloverTimeline.playReverse();">Some text</span>
+Regular transition:<br/>
+                <span id="myspan" style="color:rgb(0,0,255);" onmouseover="rolloverTimeline1.play();"
+                          onmouseout="rolloverTimeline1.playReverse();">Some text</span>
+                          <script>
+                          var rolloverTimeline1 = new Timeline(myspan.style);
+                          rolloverTimeline1.addPropertiesToInterpolate([
+                          	
+                          	{ property: "color", from:"rgb(0,0,0)", to:"rgb(255,0,0)",
+                          	interpolator: new RGBPropertyInterpolator()
+                          },
+                          { property: "font-size", from:16, to: 36,
+                          	interpolator: new IntPropertyInterpolator()}
+                          ]);
+                          </script>
+    <script>
+	var rolloverTimeline = new Timeline(timeline.style);
+	rolloverTimeline.addPropertiesToInterpolate([
+    // interpolate the foreground color between blue and red
+    { property: "color", from: "rgb(0,0,255)", to: "rgb(255,0,0)", 
+    interpolator: new RGBPropertyInterpolator()},
+    // interpolate the background color between white and light yellow
+    { property: "backgroundColor", from: "rgb(255,255,255)", to: "rgb(255,255,200)", 
+    interpolator: new RGBPropertyInterpolator()}
+    ]);
+  // over the period of 2 seconds
+  rolloverTimeline.duration = 2000;
+  </script>
+	<script type="text/javascript">
+	var canvas = document.getElementById('exprimentalboard');
+	var context = canvas.getContext("2d");
+	var img = new Image();
+	img.src = './experimentalResources/experimentimage.png';
+	context.drawImage(img,5,5,100,205,0,0,100,250);
+	</script>
+	
+</body>
+</html>

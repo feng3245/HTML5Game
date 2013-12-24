@@ -1,0 +1,133 @@
+<html>
+
+<head>
+  <script type='text/javascript' src='../trident.js'></script>
+  <script type='text/javascript' src='ballVisualizer.js'></script>
+
+<script>
+
+function Ball() {
+  this.radius = 20;
+  this.ballY = this.radius;
+}
+
+var ball = new Ball();
+
+function draw() {
+  var canvas = document.getElementById("ballCanvas");
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+    
+    var w = canvas.width;
+    var h = canvas.height;
+    
+    ctx.clearRect(0,0,w,h); 
+    ctx.beginPath();
+    ctx.arc(w/2, ball.ballY, ball.radius, 0, 360, false);
+
+    var radgrad = ctx.createRadialGradient(
+      w/2-ball.radius/4, ball.ballY-ball.radius/5, ball.radius/4,
+      w/2, ball.ballY, ball.radius);
+    radgrad.addColorStop(0, '#00FF00');
+    radgrad.addColorStop(1, '#003300');
+    ctx.fillStyle = radgrad;
+    ctx.fill();
+  }
+}
+
+function drawVisualizer() {
+  var canvas = document.getElementById("visualizerCanvas");
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+    
+    var w = canvas.width;
+    var h = canvas.height;
+    
+    visualizer.draw(ctx, w, h);
+  }
+}
+
+</script>
+
+</head>
+
+<body onload="draw(); drawVisualizer();">
+  <canvas id="ballCanvas" width="400" height="200"></canvas><br>
+  <canvas id="visualizerCanvas" width="400" height="200"></canvas><br>
+
+  To skip:
+  <input id="toSkip" value="0"><br>
+
+  <input type="button" name="buttonDown" value="down" onClick="play()">
+  <input type="button" name="buttonUp" value="up" onClick="playReverse()">
+  -
+  <input type="button" name="buttonReDown" value="down from top" onClick="timeline.replay()">
+  <input type="button" name="buttonReUp" value="up from bottom" onClick="timeline.replayReverse()">
+  <br>
+
+  <input type="button" name="buttonCancel" value="cancel" onClick="timeline.cancel()">
+  <input type="button" name="buttonEnd" value="end" onClick="timeline.end()">
+  <input type="button" name="buttonAbort" value="abort" onClick="timeline.abort()">
+  -
+  <input type="button" name="buttonSuspend" value="suspend" onClick="timeline.suspend()">
+  <input type="button" name="buttonResume" value="resume" onClick="timeline.resume()">
+  
+  <div id="stateTracking"/>
+  
+  <script>
+    var visualizer = new TimelineVisualizer();
+
+    var timeline = new Timeline(ball);
+    timeline.addPropertiesToInterpolate([
+      // interpolate the ball Y position
+      { property: "ballY", 
+        from: ball.radius, 
+        to: document.getElementById("ballCanvas").height - ball.radius, 
+        interpolator: new IntPropertyInterpolator() }
+    ]);
+    var drawCallback = function(timeline, durationFraction, timelinePosition) {
+      draw();
+    }
+    var reportStateChange = function(timeline, oldState, newState, durationFraction, timelinePosition) {
+      stateTracking.innerHTML += ("From " + oldState + " to " + newState + 
+        " at " + timelinePosition + "<br>");
+      draw();
+    }
+    timeline.addEventListener("onpulse", drawCallback);
+    timeline.addEventListener("onstatechange", reportStateChange);
+
+    var visualizerCallback = function(timeline, durationFraction, timelinePosition) {
+      visualizer.addDot(durationFraction, timelinePosition);
+    }
+    timeline.addEventListener("onpulse", visualizerCallback);
+    timeline.duration = 2000;
+    timeline.initialDelay = 0;
+
+    var visualizerRepaintTimeline = new Timeline();
+    visualizerRepaintTimeline.addEventListener("onpulse", 
+      function(timeline, durationFraction, timelinePosition) {
+        drawVisualizer();
+      });
+    visualizerRepaintTimeline.playInfiniteLoop(RepeatBehavior.REVERSE);
+
+    function play() {
+      var msToSkip = parseInt(document.getElementById("toSkip").value);
+      if (msToSkip == 0) {
+        timeline.play();
+      } else {
+        timeline.playSkipping(msToSkip);
+      }
+    }
+
+    function playReverse() {
+      var msToSkip = parseInt(document.getElementById("toSkip").value);
+      if (msToSkip == 0) {
+        timeline.playReverse();
+      } else {
+        timeline.playReverseSkipping(msToSkip);
+      }
+    }
+  </script>
+</body>
+
+</html>
