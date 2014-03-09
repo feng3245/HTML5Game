@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head><title>canvas game</title>
+	<script type="text/javascript" src="../HTML5Experiment/experimentalResources/trident/trident.js"></script>
+</head>
+<body><canvas id="test" height="600" width="600"></canvas><script type="text/javascript">
+var context = document.getElementById('test').getContext('2d');
+var current = 0;
+var img0 = new Image();
+var img1 = new Image();
+var img2 = new Image();
+var img3 = new Image();
+img0.src = "./Sprites/Yellow.png";
+img1.src = "./Sprites/Orange.png";
+img2.src = "./Sprites/pink.png";
+img3.src = "./Sprites/Red.png";
+
+self.setupTimeline = function() {
+self.parallaxTimeline = new Timeline(this);
+
+self.parallaxTimeline.duration = 5000;
+self.parallaxTimeline.addEventListener("onpulse",
+function (timeline, durationFraction, timelinePosition) {
+var ctx = self.context;
+ ctx.clearRect(0, 0, 320, 200);
+  // background layer is stationary
+ ctx.drawImage(img0, 0, 0);
+
+ self.drawLayer(timelinePosition, img1);
+ self.drawLayer(timelinePosition, img2);
+ self.drawLayer(timelinePosition, img3);
+  });
+  self.parallaxTimeline.playInfiniteLoop(RepeatBehavior.LOOP);
+}
+self.drawLayer = function(position, image) {
+var ctx = self.context;
+
+ var startX = position*image.width;
+var pixelsLeft = image.width - startX;
+var pixelsToDraw;
+ctx.drawImage(image, startX, 0, pixelsLeft, 200, 0, 0, pixelsLeft, 200);
+if(pixelsLeft < 320) {
+ pixelsToDraw = image.width - pixelsLeft;
+ ctx.drawImage(image, 0, 0, pixelsToDraw, 200,
+ pixelsLeft-1, 0, pixelsToDraw, 200);
+ }
+}
+setupTimeline();
+</script></body>

@@ -19,13 +19,21 @@ Regular transition:<br/>
                           	{ property: "color", from:"rgb(0,0,0)", to:"rgb(255,0,0)",
                           	interpolator: new RGBPropertyInterpolator()
                           },
-                          { property: "font-size", from:16, to: 36,
+                          { property: "fontSize", from:16, to: 36,
                           	interpolator: new IntPropertyInterpolator()}
                           ]);
                           </script>
     <script>
 	var rolloverTimeline = new Timeline(timeline.style);
 	rolloverTimeline.addPropertiesToInterpolate([
+    {
+      property: 'marginLeft', from:100, to:120,
+      interpolator: new PixelPropertyIntegerInterpolater()
+    },
+    {
+      property: 'fontSize', from:16, to:36,
+      interpolator: new PixelPropertyIntegerInterpolater()
+    },
     // interpolate the foreground color between blue and red
     { property: "color", from: "rgb(0,0,255)", to: "rgb(255,0,0)", 
     interpolator: new RGBPropertyInterpolator()},

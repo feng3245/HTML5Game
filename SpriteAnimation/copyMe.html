@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<head><title>Copy Me</title>
+	<script type="text/javascript" src="../HTML5Experiment/experimentalResources/trident/trident.js"></script>
+</head>
+<body><canvas id="test" height="700" width="700"></canvas><script type="text/javascript">
+var canvas = document.getElementById("test");
+var ctx = canvas.getContext('2d');
+ctx.save();
+ctx.fillStyle = "rgb(150,150,0)";
+ctx.shadowColor = "gray";
+ctx.shadowOffsetX = 5;
+ctx.shadowOffsetY = 10;
+ctx.beginPath();
+ctx.rect(400,200, 200,200);
+ctx.fill();
+ctx.restore();
+</script></body>

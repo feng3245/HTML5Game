@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<head><title>canvas game</title>
+	<script type="text/javascript" src="../HTML5Experiment/experimentalResources/trident/trident.js"></script>
+</head>
+<body><canvas id="test" height="600" width="600"></canvas><script type="text/javascript">
+var context = document.getElementById('test').getContext('2d');
+var current = 0;
+var sheet = new Image();
+sheet.src = "./Sprites/zombiesprites.png";
+var spriteTimeline = new Timeline(this);
+self.init = function() {
+// Truncated for brevity
+ var self = this;
+self.current = 0;
+self.spriteTimeline.addPropertiesToInterpolate([
+ { property: "current", from:0, to: 36,
+  interpolator: new IntPropertyInterpolator()}
+ ]);
+
+  self.spriteTimeline.duration = 5000;
+ self.spriteTimeline.addEventListener("onpulse",
+  function (timeline, durationFraction, timelinePosition) {
+ self.drawSprite();
+ });
+ self.spriteTimeline.play();
+}
+self.drawSprite = function() {
+  var ctx = self.context;
+ var row = 1;
+ ctx.clearRect(0, 0, 128, 128);
+ ctx.drawImage(self.sheet, self.current *128,
+  row*128, 128, 128, 0, 0, 128, 128);
+}
+init();
+</script></body>
