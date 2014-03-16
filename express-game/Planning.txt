@@ -1,0 +1,12 @@
+Iteration 1
+
+I want the game to support multiplayers above 2
+
+Desc:
+The game currently support players of up to 2. I want the game to take in as many players as possible
+
+Tasks
+
+1. Locate all the places that are hard coded with the other player(1 hr)(actual: 2hr)
+2. Make it support more than one of the other player(2 hr)
+3. Refactor and build abstraction(3 hr)
